@@ -1,0 +1,34 @@
+# Render Blueprint: Dashboard -> New -> Blueprint -> alege repo-ul.
+# (Render nu citește Procfile; comanda de pornire de aici e aceeași.)
+services:
+  - type: web
+    name: telegram-sniper
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false            # Render îți cere valoarea la creare; nu ajunge în git
+      - key: PYTHON_VERSION
+        value: 3.13.5
+      - key: SEARCH_TEMPLATE
+        value: https://www.publi24.ro/anunturi/?q={q}
+      - key: CHECK_INTERVAL
+        value: "300"
+      - key: MAX_SEARCHES_PER_CHAT
+        value: "10"
+      - key: CHECK_COOLDOWN
+        value: "60"
+      - key: LOG_LEVEL
+        value: INFO
+      # Fără disk persistent, sniper.db se pierde la fiecare redeploy/restart.
+      # Pe un plan plătit: adaugă un disk montat la /var/data și decomentează:
+      # - key: DB_PATH
+      #   value: /var/data/sniper.db
+    # disk:
+    #   name: data
+    #   mountPath: /var/data
+    #   sizeGB: 1
